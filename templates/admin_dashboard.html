@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Online Examination System</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .admin-layout {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 850px) {
+            .admin-layout { grid-template-columns: 1fr; }
+        }
+        .sidebar {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius-lg);
+            padding: 20px 14px;
+            height: fit-content;
+        }
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            transition: var(--transition-fast);
+            cursor: pointer;
+        }
+        .nav-tab:hover, .nav-tab.active {
+            background: var(--accent-glow);
+            color: #ffffff;
+            box-shadow: var(--shadow-glow);
+        }
+        .main-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            min-height: 600px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 13.5px;
+        }
+        .data-table th, .data-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .data-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.5);
+        }
+        .data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .badge-info { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4); }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 4px;
+        }
+        .btn-sm.btn-success { background: rgba(16, 185, 129, 0.3); color: #6ee7b7; }
+        .btn-sm.btn-warning { background: rgba(245, 158, 11, 0.3); color: #fcd34d; }
+        .btn-sm.btn-danger { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+        .btn-sm.btn-primary { background: rgba(99, 102, 241, 0.4); color: #c7d2fe; }
+
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-box {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .question-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 12.5px;
+        }
+        .opt-box {
+            background: rgba(255,255,255,0.03);
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #cbd5e1;
+        }
+        .opt-box.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #6ee7b7;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body style="justify-content: flex-start; padding-top: 20px;">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span>⚡</span> Admin Control Center
+        </div>
+        <div class="user-badge">
+            <span id="admin-display-name">Welcome, Admin</span>
+            <button id="logout-btn" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a class="nav-tab active" id="nav-overview" data-tab="overview">
+                <span>📊</span> Dashboard Overview
+            </a>
+            <a class="nav-tab" id="nav-students" data-tab="students">
+                <span>👥</span> Manage Students
+            </a>
+            <a class="nav-tab" id="nav-courses" data-tab="courses">
+                <span>📚</span> Manage Courses
+            </a>
+            <a class="nav-tab" id="nav-exams" data-tab="exams">
+                <span>📝</span> Manage Exams & MCQs
+            </a>
+            <a class="nav-tab" id="nav-results" data-tab="results">
+                <span>🏆</span> Student Exam Results
+            </a>
+        </aside>
+
+        <!-- Main Panel -->
+        <main class="main-panel">
+
+            <!-- TAB 1: OVERVIEW -->
+            <div id="tab-overview" class="tab-content">
+                <h2 style="margin-bottom: 6px; color:#f8fafc;">Dashboard Overview</h2>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom: 24px;">Key system metrics and live status counts.</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+                    <div style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="font-size: 32px; font-weight: 700; color: #818cf8;" id="stat-students">0</div>
+                        <div style="color: #94a3b8; font-size: 13px; margin-top: 4px;">Total Students</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="font-size: 32px; font-weight: 700; color: #f87171;" id="stat-blocked">0</div>
+                        <div style="color: #94a3b8; font-size: 13px; margin-top: 4px;">Blocked Students</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="font-size: 32px; font-weight: 700; color: #c084fc;" id="stat-courses">0</div>
+                        <div style="color: #94a3b8; font-size: 13px; margin-top: 4px;">Academic Courses</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="font-size: 32px; font-weight: 700; color: #34d399;" id="stat-exams">0</div>
+                        <div style="color: #94a3b8; font-size: 13px; margin-top: 4px;">Total Exams</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="font-size: 32px; font-weight: 700; color: #38bdf8;" id="stat-published">0</div>
+                        <div style="color: #94a3b8; font-size: 13px; margin-top: 4px;">Published Exams</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: MANAGE STUDENTS -->
+            <div id="tab-students" class="tab-content" style="display: none;">
+                <h2 style="margin-bottom: 6px; color:#f8fafc;">Student Account Management</h2>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom: 20px;">View registered students, toggle block/unblock status, or delete accounts.</p>
+
+                <table class="data-table" id="students-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name / Username</th>
+                            <th>Email / Phone</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                            <th>DOB</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TAB 3: MANAGE COURSES -->
+            <div id="tab-courses" class="tab-content" style="display: none;">
+                <h2 style="margin-bottom: 6px; color:#f8fafc;">Academic Courses (CRUD)</h2>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom: 20px;">Manage course offerings and department mapping.</p>
+
+                <!-- Add Course Card -->
+                <div style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <h4 style="margin-bottom: 14px; color:#f8fafc;">Add New Course</h4>
+                    <div id="course-form-alert" class="alert"></div>
+                    <form id="add-course-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="course-code">Course Code *</label>
+                                <input type="text" id="course-code" class="input-control" placeholder="e.g. SE303" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="course-name">Course Name *</label>
+                                <input type="text" id="course-name" class="input-control" placeholder="e.g. Software Quality Assurance" required>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="course-dept">Department *</label>
+                                <select id="course-dept" class="input-control" required>
+                                    <option value="">Select Department...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="course-desc">Description</label>
+                                <input type="text" id="course-desc" class="input-control" placeholder="Brief course summary">
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-add-course" class="btn-primary" style="width: auto; padding: 10px 24px;">Create Course</button>
+                    </form>
+                </div>
+
+                <table class="data-table" id="courses-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Total Exams</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courses-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TAB 4: MANAGE EXAMS -->
+            <div id="tab-exams" class="tab-content" style="display: none;">
+                <h2 style="margin-bottom: 6px; color:#f8fafc;">Exam Creation & Publishing</h2>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom: 20px;">Create exams, configure duration (5-180 mins), author MCQs, and publish for students.</p>
+
+                <!-- Create Exam Form -->
+                <div style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <h4 style="margin-bottom: 14px; color:#f8fafc;">Create New Exam</h4>
+                    <div id="exam-form-alert" class="alert"></div>
+                    <form id="create-exam-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="exam-title">Exam Title *</label>
+                                <input type="text" id="exam-title" class="input-control" placeholder="e.g. Midterm Assessment" required>
+                                <span id="err-title" class="field-error"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="exam-course">Course *</label>
+                                <select id="exam-course" class="input-control" required>
+                                    <option value="">Select Course...</option>
+                                </select>
+                                <span id="err-course_id" class="field-error"></span>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="exam-duration">Duration (Minutes: Min 5, Max 180) *</label>
+                                <input type="number" id="exam-duration" class="input-control" placeholder="15" min="5" max="180" required>
+                                <span id="err-duration_minutes" class="field-error"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="exam-marks">Total Marks *</label>
+                                <input type="number" id="exam-marks" class="input-control" value="10" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exam-desc">Exam Instructions / Description</label>
+                            <input type="text" id="exam-desc" class="input-control" placeholder="Read all questions carefully.">
+                        </div>
+                        <button type="submit" id="btn-create-exam" class="btn-primary" style="width: auto; padding: 10px 24px;">Create Exam</button>
+                    </form>
+                </div>
+
+                <table class="data-table" id="exams-table">
+                    <thead>
+                        <tr>
+                            <th>Exam Title</th>
+                            <th>Course</th>
+                            <th>Duration</th>
+                            <th>Marks</th>
+                            <th>Questions</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exams-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TAB 5: STUDENT RESULTS -->
+            <div id="tab-results" class="tab-content" style="display: none;">
+                <h2 style="margin-bottom: 6px; color:#f8fafc;">Student Examination Results</h2>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom: 20px;">Review student exam submissions, scores, and manage attempt resets.</p>
+
+                <table class="data-table" id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Exam / Course</th>
+                            <th>Score</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                            <th>Submitted At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- QUESTIONS MANAGEMENT MODAL -->
+    <div id="questions-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                <h3 style="color:#f8fafc;" id="modal-exam-title">Manage Questions</h3>
+                <button onclick="closeQuestionsModal()" class="btn-sm btn-danger" style="padding: 6px 12px;">Close ✖</button>
+            </div>
+
+            <!-- Existing Questions List -->
+            <div id="questions-list-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+                <!-- Loaded dynamically -->
+            </div>
+
+            <!-- Add New Question Form -->
+            <div style="background: rgba(15, 23, 42, 0.8); padding: 18px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <h4 style="margin-bottom: 12px; color:#f8fafc;">Add New Question (MCQ)</h4>
+                <div id="q-form-alert" class="alert"></div>
+                <form id="add-question-form">
+                    <div class="form-group">
+                        <label for="q-text">Question Text *</label>
+                        <input type="text" id="q-text" class="input-control" placeholder="What does HTML stand for?" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="q-op-a">Option A *</label>
+                            <input type="text" id="q-op-a" class="input-control" placeholder="Option A text" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="q-op-b">Option B *</label>
+                            <input type="text" id="q-op-b" class="input-control" placeholder="Option B text" required>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="q-op-c">Option C *</label>
+                            <input type="text" id="q-op-c" class="input-control" placeholder="Option C text" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="q-op-d">Option D *</label>
+                            <input type="text" id="q-op-d" class="input-control" placeholder="Option D text" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="q-correct">Correct Option *</label>
+                        <select id="q-correct" class="input-control" required>
+                            <option value="A">Option A</option>
+                            <option value="B">Option B</option>
+                            <option value="C">Option C</option>
+                            <option value="D">Option D</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="btn-add-question" class="btn-primary">Add Question to Exam</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/admin_dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration - Online Examination System</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="auth-container wide">
+        <div class="brand-header">
+            <div class="brand-logo">📝</div>
+            <h1>Student Registration</h1>
+            <p>Create your account to take academic exams</p>
+        </div>
+
+        <div id="register-error" class="alert alert-danger" role="alert"></div>
+        <div id="register-success" class="alert alert-success" role="alert"></div>
+
+        <form id="register-form" novalidate>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="register-fullname">Full Name *</label>
+                    <input type="text" id="register-fullname" class="input-control" placeholder="John Doe" required>
+                    <span id="err-full_name" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-studentid">Student ID *</label>
+                    <input type="text" id="register-studentid" class="input-control" placeholder="STU1001" required>
+                    <span id="err-student_id" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="register-email">Email Address *</label>
+                    <input type="email" id="register-email" class="input-control" placeholder="john@student.com" required>
+                    <span id="err-email" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-phone">Phone Number (10 digits) *</label>
+                    <input type="tel" id="register-phone" class="input-control" placeholder="9876543210" maxlength="10" required>
+                    <span id="err-phone" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="register-username">Username *</label>
+                    <input type="text" id="register-username" class="input-control" placeholder="johndoe" required>
+                    <span id="err-username" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-course">Select Academic Course *</label>
+                    <select id="register-course" class="input-control" required>
+                        <option value="">Loading courses...</option>
+                    </select>
+                    <span id="err-course_id" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="register-password">Password (8-20 chars) *</label>
+                    <input type="password" id="register-password" class="input-control" placeholder="••••••••" required>
+                    <span id="err-password" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirm Password *</label>
+                    <input type="password" id="register-confirm-password" class="input-control" placeholder="••••••••" required>
+                    <span id="err-confirm_password" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="register-dob">Date of Birth (Min Age 15) *</label>
+                <input type="date" id="register-dob" class="input-control" required>
+                <span id="err-dob" class="field-error"></span>
+            </div>
+
+            <button type="submit" id="register-btn" class="btn-primary" style="margin-top: 10px;">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+            Already registered? <a href="/login" id="login-link" class="link-btn">Sign In here</a>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/register.js"></script>
+</body>
+</html>

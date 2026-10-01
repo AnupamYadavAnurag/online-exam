@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Online Examination System</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="brand-header">
+            <div class="brand-logo">🎓</div>
+            <h1>Online Examination System</h1>
+            <p>Enter your credentials to access your portal</p>
+        </div>
+
+        <div id="login-error" class="alert alert-danger" role="alert"></div>
+        <div id="login-success" class="alert alert-success" role="alert"></div>
+
+        <form id="login-form" novalidate>
+            <div class="form-group">
+                <label for="login-username">Username or Email</label>
+                <input type="text" id="login-username" class="input-control" placeholder="e.g. alice1 or alice@student.com" required>
+                <span id="err-username" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" class="input-control" placeholder="••••••••" required>
+                <span id="err-password" class="field-error"></span>
+            </div>
+
+            <div class="form-actions">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="login-remember">
+                    <span>Remember Me</span>
+                </label>
+                <a href="/forgot-password" id="forgot-password-link" class="link-btn">Forgot password?</a>
+            </div>
+
+            <button type="submit" id="login-btn" class="btn-primary">Sign In</button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="/register" id="register-link" class="link-btn">Register as Student</a>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/login.js"></script>
+</body>
+</html>
